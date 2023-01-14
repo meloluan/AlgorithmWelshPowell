@@ -15,7 +15,7 @@ void addNodeIfNotExist(char *node, char node1, int numNodes);
 int toColor(Graph *g);
 void sortArrayDescending(char *arr, size_t size);
 
-int main()
+int main(int argc, char **argv)
 {
     FILE *file;
     char buf[SIZE_FILE_BUFFER];
@@ -25,7 +25,13 @@ int main()
     Graph *head = NULL;
     Graph *aux = NULL;
 
-    file = fopen("./Graph.txt", "r");
+    if (argc == 1)
+    {
+        printf("Fail! Enter filename.\n");
+        return -1;
+    }
+
+    file = fopen(argv[1], "r");
     if (file == NULL)
     {
         printf("Open file error.\n");
