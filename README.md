@@ -1,4 +1,4 @@
-# Algorithm Welsh Powell
+# Algorithm Welsh-Powell
 
 This algorithm is used to find the approximate coloring of a graph.
 
