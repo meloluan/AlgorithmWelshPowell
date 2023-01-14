@@ -33,15 +33,15 @@ list *allocateObject(char k)
     return x;
 }
 
-graph *graphSearch(graph *L, char k)
+Graph *GraphSearch(Graph *L, char k)
 {
-    graph *x = L;
+    Graph *x = L;
     while (x != NULL && x->key != k)
         x = x->next;
     return x;
 }
 
-void nodeInsert(graph **G, graph *x)
+void nodeInsert(Graph **G, Graph *x)
 {
     x->next = *G;
     if (*G != NULL)
@@ -50,23 +50,24 @@ void nodeInsert(graph **G, graph *x)
     x->prev = NULL;
 }
 
-graph *allocateGraph(char k)
+Graph *allocateGraph(char k)
 {
-    graph *x = (graph *)malloc(sizeof(struct node));
+    Graph *x = (Graph *)malloc(sizeof(struct node));
     x->key = k;
     x->edge = NULL;
     x->next = NULL;
     x->prev = NULL;
     x->color = -1;
+    x->nEdges = 0;
     return x;
 }
 
-void printGraph(graph *g)
+void printGraph(Graph *g)
 {
-    graph *auxg = g;
+    Graph *auxg = g;
     while (auxg != NULL)
     {
-        printf("Node: %c | Color: %d\n\t\t edge: ", auxg->key, auxg->color);
+        printf("Node: %c | Color: %d | Num Edges: %d | Edges: ", auxg->key, auxg->color, auxg->nEdges);
 
         list *auxl = auxg->edge;
         printList(auxl);
@@ -74,7 +75,7 @@ void printGraph(graph *g)
     }
 }
 
-int getNumNodes(graph *g)
+int getNumNodes(Graph *g)
 {
     int count = 0;
     while (g != NULL)
@@ -83,4 +84,83 @@ int getNumNodes(graph *g)
         g = g->next;
     }
     return count;
+}
+
+void sort(Graph **start)
+{
+    if (((*start)->next == NULL) || (*start == NULL))
+    {
+        return;
+    }
+    Graph *max = findmax(*start);
+    if (max == NULL)
+        return;
+    swap(*start, max, start);
+    sort(&((*start)->next));
+}
+
+void swap(Graph *p1, Graph *p2, Graph **start)
+{
+    Graph *p1pre = NULL;
+    Graph *p1curr = *start;
+    while (p1curr != p1)
+    {
+        p1pre = p1curr;
+        p1curr = p1curr->next;
+    }
+    Graph *p2pre = NULL;
+    Graph *p2curr = *start;
+    while (p2curr != p2)
+    {
+        p2pre = p2curr;
+        p2curr = p2curr->next;
+    }
+    if (p1pre != NULL)
+    {
+        p1pre->next = p2curr;
+    }
+    else
+    {
+        *start = p2curr;
+    }
+    if (p2pre != NULL)
+    {
+        p2pre->next = p1curr;
+    }
+    else
+    {
+        *start = p1curr;
+    }
+    Graph *temp = p2curr->next;
+    p2curr->next = p1curr->next;
+    p1curr->next = temp;
+}
+
+Graph *findmax(Graph *start)
+{
+    int flag = 0;
+    if (start != NULL)
+    {
+        Graph *curr = start->next;
+        Graph *max = start;
+        while (curr->next != NULL)
+        {
+            if (max->nEdges < curr->nEdges)
+            {
+                max = curr;
+                flag++;
+            }
+            curr = curr->next;
+        }
+        if ((curr->next == NULL) && (max->nEdges < curr->nEdges))
+        {
+            max = curr;
+            flag++;
+        }
+        if (flag > 0)
+        {
+            return max;
+        }
+    }
+    return start;
 }

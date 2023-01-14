@@ -12,7 +12,8 @@ typedef struct
 } tuple;
 
 void addNodeIfNotExist(char *node, char node1, int numNodes);
-void toColor(graph *g);
+int toColor(Graph *g);
+void sortArrayDescending(char *arr, size_t size);
 
 int main()
 {
@@ -21,10 +22,10 @@ int main()
     int numNodes = 0;
     int numEdges = 0;
     int charsRead = 0;
-    graph *head = NULL;
-    graph *aux = NULL;
+    Graph *head = NULL;
+    Graph *aux = NULL;
 
-    file = fopen("./graph.txt", "r");
+    file = fopen("./Graph.txt", "r");
     if (file == NULL)
     {
         printf("Open file error.\n");
@@ -60,7 +61,7 @@ int main()
         connections[index].node1 = buf[0];
         connections[index].node2 = buf[2];
         index++;
-        // The graph is not oriented, so we duplicate the edges
+        // The Graph is not oriented, so we duplicate the edges
         connections[index].node2 = buf[0];
         connections[index].node1 = buf[2];
         index++;
@@ -68,22 +69,29 @@ int main()
 
     printf("\n");
 
+    sortArrayDescending(nodes, numNodes);
+
     for (index = 0; index < numNodes; index++)
     {
         nodeInsert(&head, allocateGraph(nodes[index]));
     }
     for (index = 0; index < numEdges; index++)
     {
-        aux = graphSearch(head, connections[index].node1);
+        aux = GraphSearch(head, connections[index].node1);
         if (aux == NULL)
         {
             printf("Node not found");
             return -1;
         }
         listInsert(&aux->edge, allocateObject(connections[index].node2));
+        aux->nEdges++;
     }
-    toColor(head);
+    sort(&head);
+    int n = toColor(head);
     printGraph(head);
+
+    printf("\nINFO: The approximate number of colors needed is %d\n", n);
+
     return 0;
 }
 
@@ -110,7 +118,7 @@ void addNodeIfNotExist(char *nodeArr, char node, int numNodes)
     }
 }
 
-void toColor(graph *g)
+int toColor(Graph *g)
 {
     int numNodes = getNumNodes(g);
     bool *nodesVisited = (bool *)malloc(sizeof(bool) * numNodes);
@@ -120,7 +128,7 @@ void toColor(graph *g)
     int j;
     int color = 0;
 
-    graph *aux = g;
+    Graph *aux = g;
     while (aux != NULL)
     {
         nodes[i] = aux->key;
@@ -164,8 +172,10 @@ void toColor(graph *g)
             if (nodesVisited[j] == false)
             {
                 if (colors[j] == -1)
+                {
                     colors[j] = color;
-                break;
+                    break;
+                }
             }
         }
         for (j = 0; j < numNodes; j++)
@@ -188,5 +198,25 @@ void toColor(graph *g)
             }
         }
         aux = aux->next;
+    }
+    return color;
+}
+
+void sortArrayDescending(char *arr, size_t size)
+{
+    int i, j;
+    char a;
+
+    for (i = 0; i < size; ++i)
+    {
+        for (j = i + 1; j < size; ++j)
+        {
+            if (arr[i] < arr[j])
+            {
+                a = arr[i];
+                arr[i] = arr[j];
+                arr[j] = a;
+            }
+        }
     }
 }
